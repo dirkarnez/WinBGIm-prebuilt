@@ -58,6 +58,7 @@ jobs:
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
+          path: "graphics.h libbgi.a winbgim.h"
           type: 'zip'
           filename: "${{ env.mingwTargetZip }}"
         
