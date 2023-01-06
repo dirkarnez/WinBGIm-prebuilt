@@ -22,13 +22,16 @@ jobs:
 #         shell: cmd
 #         run: git clone --recursive https://github.com/libunwind/libunwind.git && cd libunwind && git checkout ${{ env.tagName }}
 
-      - shell: cmd
-        run: |
-          curl https://winbgim.codecutter.org/V6_0/WinBGIm6_0_Nov2005_src.zip -L --output WinBGIm6_0_Nov2005_src.zip &&^
-          7z.exe x WinBGIm6_0_Nov2005_src.zip -o"WinBGIm6_0_Nov2005_src" &&^
-          rename WinBGIm6_0_Nov2005_src WinBGIm &&^
-          cd WinBGIm &&^
-          dir
+#       - shell: cmd
+#         run: |
+#           curl https://winbgim.codecutter.org/V6_0/WinBGIm6_0_Nov2005_src.zip -L --output WinBGIm6_0_Nov2005_src.zip &&^
+#           7z.exe x WinBGIm6_0_Nov2005_src.zip -o"WinBGIm6_0_Nov2005_src" &&^
+#           rename WinBGIm6_0_Nov2005_src WinBGIm &&^
+#           cd WinBGIm &&^
+#           dir
+
+      - name: Checkout
+        uses: actions/checkout@v3
           
       - name: Install MSYS2
         uses: msys2/setup-msys2@v2
@@ -48,21 +51,19 @@ jobs:
         shell: msys2 {0}
         run: |
           workspace=$(pwd) &&
-          cd WinBGIm && 
           export PATH="$workspace/mingw64:$workspace/mingw64/bin:$workspace/msys64/usr/bin:/usr/bin" &&
           g++ --version && 
-          make && make install
+          make && make install && ls
             
       - name: Archive Release
         uses: thedoctor0/zip-release@master
         with:
           type: 'zip'
-          directory: "WinBGIm/${{ env.installationPath }}"
           filename: "${{ env.mingwTargetZip }}"
         
       - name: Release prebuilt
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "WinBGIm/${{ env.installationPath }}/${{ env.mingwTargetZip }}"
+          artifacts: "${{ env.mingwTargetZip }}"
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
